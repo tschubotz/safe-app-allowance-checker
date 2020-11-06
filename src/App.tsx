@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from "styled-components";
 import { Button, Loader, Title, Text } from "@gnosis.pm/safe-react-components";
 import { useSafe } from '@rmeissner/safe-apps-react-sdk';
@@ -40,6 +40,7 @@ const App: React.FC = () => {
   const safe = useSafe()
   const [fetching, setFetching] = useState(false)
   const [allowances, setAllowances] = useState(new Array<IAllowance>());
+  const etherscanLink = safe.info.network === "rinkeby"? "https://rinkeby.etherscan.io/" : "https://etherscan.io/";
 
   const getAllowanceString = function(allowance:BN, decimals:BN) {
     const divisor = new BN(10).pow(decimals);
@@ -49,11 +50,15 @@ const App: React.FC = () => {
     return beforeDecimal.toString() + "." + afterDecimal.toString();
   }
 
+  useEffect(() => {
+    fetchAllowances();
+  },[]);
+
   const resetAllowance = useCallback(async (tokenAddress, spender) => {
     try {
       const erc20Contract = new web3.eth.Contract(erc20Abi, tokenAddress);
         console.log(safe.info.safeAddress);
-        debugger;
+
         const safeTxHash = await safe.sendTransactions([
           {
             "to": tokenAddress,
@@ -69,10 +74,11 @@ const App: React.FC = () => {
       }
   }, []);
 
-  const fetchData = useCallback(async () => {
+  const fetchAllowances = useCallback(async () => {
     setFetching(true);
     const erc20Contract = new web3.eth.Contract(erc20Abi);
 
+    // Get all Approval events
     const approvals = await erc20Contract.getPastEvents("Approval",
       {
         filter: { owner: safe.info.safeAddress },
@@ -80,7 +86,8 @@ const App: React.FC = () => {
         toBlock: 'latest'
       });
 
-    // Get all unique Approvals that were set at some point in the past.
+
+    // Get unique approvals since we are gonna double check approvals anyway again.
     const uniqueApprovals = new Set<IApproval>();
 
     // TODO what if error
@@ -89,11 +96,11 @@ const App: React.FC = () => {
       uniqueApprovals.add({ token: approval["address"], spender: approval["returnValues"][1] });
     });
 
+    // convert to array to have array functions.
     const uniqueApprovalsArray = Array.from(uniqueApprovals);
+    
     // Now get the current allowance for each one
-
     const allowances = new Array<IAllowance>();
-
 
     for await (const approval of uniqueApprovalsArray) {
       const tokenContract = new web3.eth.Contract(erc20Abi, approval.token);
@@ -121,24 +128,22 @@ const App: React.FC = () => {
 
 
     setFetching(false);
-    console.log(allowances);
-    
     setAllowances(allowances);
-
-
   }, [safe])
 
   return <Container>
-    <Title size="md">{safe.info.safeAddress}</Title>
+    <Title size="sm">ERC20 Token allowances of your Safe</Title>
     {fetching ?
       <Loader size="md" />
       :
       <div>
-        <Button size="lg" color="primary" onClick={fetchData}>Submit</Button>
+        <Button size="lg" color="primary" onClick={fetchAllowances}>Refresh</Button>
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
+              <TableCell>
+                </TableCell>
                 <TableCell>
                   Token
                 </TableCell>
@@ -148,24 +153,26 @@ const App: React.FC = () => {
                 <TableCell>
                   Allowance
                 </TableCell>
+
               </TableRow>
             </TableHead>
               <TableBody>
                 {allowances.map((allowance: IAllowance, index) =>
                   <TableRow key={index}>
-                    <TableCell>
-                      {/* TODO make etherscan link network agnostic */}
-                      <a href={"https://rinkeby.etherscan.io/token/" + allowance.token} target="_blank">{allowance.symbol.toString()} </a>
+                     <TableCell>
+                      <Button size="lg" color="primary" onClick={() => resetAllowance(allowance.token, allowance.spender)}> Reset</Button>
                     </TableCell>
                     <TableCell>
-                    <a href={"https://rinkeby.etherscan.io/token/" + allowance.spender} target="_blank">{allowance.spender} </a>
+                      {/* TODO make etherscan link network agnostic */}
+                      <a href={etherscanLink + "token/" + allowance.token} target="_blank">{allowance.symbol.toString()} </a>
+                    </TableCell>
+                    <TableCell>
+                    <a href={etherscanLink + "address/" + allowance.spender} target="_blank">{allowance.spender} </a>
                     </TableCell>
                     <TableCell>
                       {getAllowanceString(allowance.allowance, allowance.decimals)}
                     </TableCell>
-                    <TableCell>
-                      <Button size="lg" color="primary" onClick={() => resetAllowance(allowance.token, allowance.spender)}> Reset</Button>
-                    </TableCell>
+
                   </TableRow>
                 )}
               </TableBody>
