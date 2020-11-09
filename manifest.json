@@ -1,0 +1,12 @@
+{
+  "short_name": "Allowance checker",
+  "name": "Gnosis Safe Allowance Checker",
+  "description": "Checks ERC20 token allowances and allows to rest it.",
+  "iconPath": "logo.png",
+  "icons": [
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

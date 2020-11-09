@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.js": "/safe-app-allowance-checker/static/js/main.ce8fdc47.chunk.js",
+    "main.js.map": "/safe-app-allowance-checker/static/js/main.ce8fdc47.chunk.js.map",
+    "runtime-main.js": "/safe-app-allowance-checker/static/js/runtime-main.6088853e.js",
+    "runtime-main.js.map": "/safe-app-allowance-checker/static/js/runtime-main.6088853e.js.map",
+    "static/js/2.4373bbb4.chunk.js": "/safe-app-allowance-checker/static/js/2.4373bbb4.chunk.js",
+    "static/js/2.4373bbb4.chunk.js.map": "/safe-app-allowance-checker/static/js/2.4373bbb4.chunk.js.map",
+    "index.html": "/safe-app-allowance-checker/index.html",
+    "precache-manifest.87d5afde0a84b6ed28e649faae510264.js": "/safe-app-allowance-checker/precache-manifest.87d5afde0a84b6ed28e649faae510264.js",
+    "service-worker.js": "/safe-app-allowance-checker/service-worker.js",
+    "static/js/2.4373bbb4.chunk.js.LICENSE.txt": "/safe-app-allowance-checker/static/js/2.4373bbb4.chunk.js.LICENSE.txt",
+    "static/media/averta-bold.woff2": "/safe-app-allowance-checker/static/media/averta-bold.47c7a29f.woff2",
+    "static/media/averta-normal.woff2": "/safe-app-allowance-checker/static/media/averta-normal.30559e37.woff2"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.6088853e.js",
+    "static/js/2.4373bbb4.chunk.js",
+    "static/js/main.ce8fdc47.chunk.js"
+  ]
+}
